@@ -1,17 +1,23 @@
 package com.parking.service.parking_lot.entities;
 
-import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Builder
+@Entity
 @Table(name = "place")
 public class Place {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer campus;
     private String series;
     private String basement; //sotano
     private Boolean status;
     private Boolean available;
+    @Column(name = "parking_id")
+    private Integer parkingId;
 }

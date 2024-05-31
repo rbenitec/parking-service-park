@@ -6,11 +6,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
-
 @Repository
 public interface PlaceRepository extends JpaRepository<Place, Integer> {
-    @Query(value = "select * from places where campus: = campus and series: =series", nativeQuery = true)
-    Optional<Place> getPlaceByCampus (@Param("campos") String campus,
-                                     @Param("series") String series);
+    @Query(value = "select * from place where series = :series and basement = :basement and parking_id = :parkingId", nativeQuery = true)
+    Optional<Place> getPlaceByCampus (@Param("series") String series,
+                                      @Param("basement") String basement,
+                                     @Param("parkingId") Integer parkingId);
+
+    @Query(value = "select * from place where parking_id = :parkingId", nativeQuery = true)
+    List<Place> getPlacesByParkingId (@Param("parkingId") Integer parkingId);
 }

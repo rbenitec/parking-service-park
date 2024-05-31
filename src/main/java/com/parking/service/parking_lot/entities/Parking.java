@@ -1,20 +1,24 @@
 package com.parking.service.parking_lot.entities;
 
-import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.Data;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
+@Getter
+@Setter
+@Entity
 @Table(name = "parking")
 public class Parking {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String campus;
     private String direction;
     private String link; //Link de direccion de google maps
-    private Integer place; //FK
+    @Column(name = "quantity_places")
+    private Integer quantityPlaces; //FK
 }

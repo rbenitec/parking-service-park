@@ -1,5 +1,9 @@
 package com.parking.service.parking_lot.controller;
 
+import com.parking.service.parking_lot.controller.dto.RequestCampusPark;
+import com.parking.service.parking_lot.controller.dto.RequestParkingDto;
+import com.parking.service.parking_lot.controller.dto.RequestPlaceDto;
+import com.parking.service.parking_lot.controller.dto.ResponseParkingDto;
 import com.parking.service.parking_lot.entities.Parking;
 import com.parking.service.parking_lot.entities.Place;
 import com.parking.service.parking_lot.service.ParkingService;
@@ -7,9 +11,7 @@ import com.parking.service.parking_lot.service.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,15 +32,25 @@ public class ParkingController {
         }else {
             return ResponseEntity.notFound().build();
         }
-
+    }
+    @GetMapping("/campus/park/all-places")
+    public ResponseParkingDto getParkingAndPlacesByCampus(@RequestBody RequestCampusPark campusPark){
+        return parkingService.getParkingByCampus(campusPark);
     }
 
-    @GetMapping("/get-park")
-    public ResponseEntity<Place> getPlace(@Param("campus") String campus,
-                                                @Param("series") String series){
-        Optional<Place> place =  placeService.getPlace(campus, series);
+    @GetMapping("/get-place/{parking-id}")
+    public ResponseEntity<Place> getPlace(@PathVariable("parking-id") Integer parkingId,
+                                          @Param("series") String series,
+                                          @Param("basement") String basement){
+        Optional<Place> place =  placeService.getPlace(series, basement, parkingId);
         return place.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-
-
+    @PostMapping("/created/park")
+    public Parking createdPark(@RequestBody RequestParkingDto parkingDto){
+        return parkingService.saveParking(parkingDto);
+    }
+    @PostMapping("/created/place")
+    public Place createPlace (@RequestBody RequestPlaceDto placeDto){
+        return placeService.savePlace(placeDto);
+    }
 }

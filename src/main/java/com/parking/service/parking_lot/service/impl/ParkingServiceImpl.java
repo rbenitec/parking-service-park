@@ -1,25 +1,56 @@
 package com.parking.service.parking_lot.service.impl;
 
+import com.parking.service.parking_lot.controller.dto.RequestCampusPark;
+import com.parking.service.parking_lot.controller.dto.RequestParkingDto;
+import com.parking.service.parking_lot.controller.dto.ResponseParkingDto;
 import com.parking.service.parking_lot.entities.Parking;
+import com.parking.service.parking_lot.entities.Place;
+import com.parking.service.parking_lot.repository.ParkingRepository;
 import com.parking.service.parking_lot.service.ParkingService;
+import com.parking.service.parking_lot.service.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ParkingServiceImpl implements ParkingService {
 
-    private final ParkingService parkingService;
+    private final ParkingRepository parkingRepository;
+    private final PlaceService placeService;
 
     @Override
     public List<Parking> getAllParking() {
-        return parkingService.getAllParking();
+        return parkingRepository.findAll();
     }
 
     @Override
-    public List<Parking> getParkingByCampus(String campus) {
-        return parkingService.getParkingByCampus(campus);
+    public ResponseParkingDto getParkingByCampus(RequestCampusPark campus) {
+        List<Place> places = placeService.getAllPlaceByParkingId(campus.getParkingId());
+        Optional<Parking> parking = parkingRepository.getParkingByCampus(campus.getCampus());
+        return parking.map(value -> buildResponseParking(value, places)).orElse(null);
+    }
+
+    private ResponseParkingDto buildResponseParking(Parking parking, List<Place> places) {
+        return ResponseParkingDto.builder()
+                .campus(parking.getCampus())
+                .direction(parking.getDirection())
+                .quantityPlaces(parking.getQuantityPlaces())
+                .link(parking.getLink())
+                .places(places)
+                .build();
+    }
+
+    @Override
+    public Parking saveParking(RequestParkingDto parkingDto) {
+        Parking parking = Parking.builder()
+                .campus(parkingDto.getCampus())
+                .direction(parkingDto.getDirection())
+                .link(parkingDto.getLink())
+                .quantityPlaces(parkingDto.getQuantityPlaces())
+                .build();
+        return parkingRepository.save(parking);
     }
 }
