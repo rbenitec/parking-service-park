@@ -34,12 +34,12 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public Place savePlace(RequestPlaceDto placeDto) {
         Place place = Place.builder()
-                .available(true)
+                .available(1)
                 .basement(placeDto.getBasement())
                 .parkingId(placeDto.getParkingId())
                 .series(placeDto.getSeries())
                 .parkingId(placeDto.getParkingId())
-                .status(true)
+                .status(1)
                 .build();
         return placeRepository.save(place);
     }

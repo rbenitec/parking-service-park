@@ -16,8 +16,8 @@ public class Place {
     private Integer id;
     private String series;
     private String basement; //sotano
-    private Boolean status;
-    private Boolean available;
+    private Integer status;
+    private Integer available;
     @Column(name = "parking_id")
     private Integer parkingId;
 }

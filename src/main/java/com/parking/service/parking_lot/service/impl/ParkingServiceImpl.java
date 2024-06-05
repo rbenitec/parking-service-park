@@ -1,5 +1,6 @@
 package com.parking.service.parking_lot.service.impl;
 
+import com.parking.service.parking_lot.controller.dto.ParkingCampusDto;
 import com.parking.service.parking_lot.controller.dto.RequestCampusPark;
 import com.parking.service.parking_lot.controller.dto.RequestParkingDto;
 import com.parking.service.parking_lot.controller.dto.ResponseParkingDto;
@@ -11,6 +12,7 @@ import com.parking.service.parking_lot.service.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +33,29 @@ public class ParkingServiceImpl implements ParkingService {
         List<Place> places = placeService.getAllPlaceByParkingId(campus.getParkingId());
         Optional<Parking> parking = parkingRepository.getParkingByCampus(campus.getCampus());
         return parking.map(value -> buildResponseParking(value, places)).orElse(null);
+    }
+
+    @Override
+    public List<ParkingCampusDto> getParkingByCampus() {
+        return buildParkingCampus(parkingRepository.findAll());
+
+    }
+
+    private List<ParkingCampusDto> buildParkingCampus(List<Parking> parkings) {
+        ArrayList<ParkingCampusDto> parkingCampusDtos = new ArrayList<>();
+        parkings.forEach(parking -> {
+            List<Place> places = placeService.getAllPlaceByParkingId(parking.getId());
+            Long quantityAvailableSpots = places.stream().filter(place -> place.getAvailable()==1).count();
+            ParkingCampusDto parkingCampusDto = ParkingCampusDto.builder()
+                    .campus(parking.getCampus())
+                    .direction(parking.getDirection())
+                    .link(parking.getLink())
+                    .quantityPlaces(parking.getQuantityPlaces())
+                    .availableSpot(quantityAvailableSpots)
+                    .build();
+            parkingCampusDtos.add(parkingCampusDto);
+        });
+        return parkingCampusDtos;
     }
 
     private ResponseParkingDto buildResponseParking(Parking parking, List<Place> places) {

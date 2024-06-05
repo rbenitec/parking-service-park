@@ -1,9 +1,6 @@
 package com.parking.service.parking_lot.controller;
 
-import com.parking.service.parking_lot.controller.dto.RequestCampusPark;
-import com.parking.service.parking_lot.controller.dto.RequestParkingDto;
-import com.parking.service.parking_lot.controller.dto.RequestPlaceDto;
-import com.parking.service.parking_lot.controller.dto.ResponseParkingDto;
+import com.parking.service.parking_lot.controller.dto.*;
 import com.parking.service.parking_lot.entities.Parking;
 import com.parking.service.parking_lot.entities.Place;
 import com.parking.service.parking_lot.service.ParkingService;
@@ -36,6 +33,10 @@ public class ParkingController {
     @GetMapping("/campus/park/all-places")
     public ResponseParkingDto getParkingAndPlacesByCampus(@RequestBody RequestCampusPark campusPark){
         return parkingService.getParkingByCampus(campusPark);
+    }
+    @GetMapping("/dashboard/park/available")
+    public List<ParkingCampusDto> getParkingAndPlacesAvailable(){
+        return parkingService.getParkingByCampus();
     }
 
     @GetMapping("/get-place/{parking-id}")
