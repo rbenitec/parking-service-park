@@ -6,13 +6,14 @@ import com.parking.service.parking_lot.entities.Place;
 import com.parking.service.parking_lot.service.ParkingService;
 import com.parking.service.parking_lot.service.PlaceService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @RestController
 @RequestMapping("/parking")
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class ParkingController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Parking>> getAllParking(){
+        log.info("Call getAllParking");
         List<Parking> parkings = parkingService.getAllParking();
         if(!parkings.isEmpty()){
             return ResponseEntity.ok(parkings);
@@ -32,11 +34,15 @@ public class ParkingController {
     }
     @GetMapping("/campus/park/all-places")
     public ResponseParkingDto getParkingAndPlacesByCampus(@RequestBody RequestCampusPark campusPark){
+        log.info("Call getParkingAndPlacesByCampus: {}", campusPark);
         return parkingService.getParkingByCampus(campusPark);
     }
     @GetMapping("/dashboard/park/available")
-    public List<ParkingCampusDto> getParkingAndPlacesAvailable(){
-        return parkingService.getParkingByCampus();
+    public ResponseDto getParkingAndPlacesAvailable(){
+        log.info("Call getParkingAndPlacesAvailable");
+        return ResponseDto.builder()
+                .parkingCampus(parkingService.getParkingByCampus())
+                .build();
     }
 
     @GetMapping("/get-place/{parking-id}")
