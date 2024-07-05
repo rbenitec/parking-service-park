@@ -79,5 +79,6 @@ public class ParkingController {
         return place
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+
     }
 }
