@@ -73,9 +73,9 @@ public class ParkingController {
         return placeService.savePlace(placeDto);
     }
 
-    @PatchMapping("/update/lot/{idPlace}")
-    public ResponseEntity<Place> updatePlaceParking (@PathVariable("idPlace") Integer idPlace) {
-        Optional<Place> place = placeService.updatePlace(idPlace);
+    @PostMapping("/update/lot")
+    public ResponseEntity<Place> updatePlaceParking (@RequestBody RequestTicketDto requestTicketDto) {
+        Optional<Place> place = placeService.updatePlace(requestTicketDto.getPlaceId());
         return place
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
