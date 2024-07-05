@@ -1,8 +1,10 @@
 package com.parking.service.parking_lot.service.impl;
 
 import com.parking.service.parking_lot.controller.dto.RequestPlaceDto;
+import com.parking.service.parking_lot.entities.Parking;
 import com.parking.service.parking_lot.entities.Place;
 import com.parking.service.parking_lot.repository.PlaceRepository;
+import com.parking.service.parking_lot.service.ParkingService;
 import com.parking.service.parking_lot.service.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,11 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public Optional<Place> getPlace(String series,String basement, Integer parkingId) {
         return placeRepository.getPlaceByCampus(series, basement, parkingId);
+    }
+
+    @Override
+    public List<Place> getPlacesByCampusAndAvailable(Integer parkingId) {
+        return placeRepository.getPlacesByCampusAndAvailable(parkingId);
     }
 
     @Override
@@ -42,5 +49,15 @@ public class PlaceServiceImpl implements PlaceService {
                 .status(1)
                 .build();
         return placeRepository.save(place);
+    }
+
+    @Override
+    public Optional<Place> updatePlace(Integer idPlace) {
+        Optional<Place> place = placeRepository.findById(idPlace);
+        if (place.isPresent()) {
+            place.get().setAvailable(0);
+            return Optional.of(placeRepository.save(place.get()));
+        }
+        return place;
     }
 }

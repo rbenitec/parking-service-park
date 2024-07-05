@@ -1,6 +1,7 @@
 package com.parking.service.parking_lot.controller;
 
 import com.parking.service.parking_lot.controller.dto.*;
+import com.parking.service.parking_lot.controller.response.ResponseSlots;
 import com.parking.service.parking_lot.entities.Parking;
 import com.parking.service.parking_lot.entities.Place;
 import com.parking.service.parking_lot.service.ParkingService;
@@ -35,13 +36,13 @@ public class ParkingController {
     @GetMapping("/campus/park/all-places")
     public ResponseParkingDto getParkingAndPlacesByCampus(@RequestBody RequestCampusPark campusPark){
         log.info("Call getParkingAndPlacesByCampus: {}", campusPark);
-        return parkingService.getParkingByCampus(campusPark);
+        return parkingService.getParkingByRequestCampus(campusPark);
     }
     @GetMapping("/dashboard/park/available")
     public ResponseDto getParkingAndPlacesAvailable(){
         log.info("Call getParkingAndPlacesAvailable");
         return ResponseDto.builder()
-                .parkingCampus(parkingService.getParkingByCampus())
+                .parkingCampus(parkingService.getAllParkingByCampus())
                 .build();
     }
 
@@ -52,6 +53,17 @@ public class ParkingController {
         Optional<Place> place =  placeService.getPlace(series, basement, parkingId);
         return place.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    /**
+     * Metodo, para autoasignar un espacio.
+     * @param campus
+     * @return
+     */
+    @GetMapping("/assigned-place/{campus}")
+    public ResponseEntity<ResponseSlots> getPlaceAutoAssigned(@PathVariable("campus") String campus){
+        Optional<ResponseSlots> place =  parkingService.getPlaceAutoAssigned(campus);
+        return place.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
     @PostMapping("/created/park")
     public Parking createdPark(@RequestBody RequestParkingDto parkingDto){
         return parkingService.saveParking(parkingDto);
@@ -59,5 +71,13 @@ public class ParkingController {
     @PostMapping("/created/place")
     public Place createPlace (@RequestBody RequestPlaceDto placeDto){
         return placeService.savePlace(placeDto);
+    }
+
+    @PatchMapping("/update/lot/{idPlace}")
+    public ResponseEntity<Place> updatePlaceParking (@PathVariable("idPlace") Integer idPlace) {
+        Optional<Place> place = placeService.updatePlace(idPlace);
+        return place
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

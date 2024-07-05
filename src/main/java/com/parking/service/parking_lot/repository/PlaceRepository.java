@@ -17,4 +17,7 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
 
     @Query(value = "select * from place where parking_id = :parkingId", nativeQuery = true)
     List<Place> getPlacesByParkingId (@Param("parkingId") Integer parkingId);
+
+    @Query(value = "select * from place where parking_id = :parkingId and available = 1", nativeQuery = true)
+    List<Place> getPlacesByCampusAndAvailable (@Param("parkingId") Integer parkingId);
 }

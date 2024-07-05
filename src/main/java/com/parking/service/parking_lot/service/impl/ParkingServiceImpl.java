@@ -4,6 +4,7 @@ import com.parking.service.parking_lot.controller.dto.ParkingCampusDto;
 import com.parking.service.parking_lot.controller.dto.RequestCampusPark;
 import com.parking.service.parking_lot.controller.dto.RequestParkingDto;
 import com.parking.service.parking_lot.controller.dto.ResponseParkingDto;
+import com.parking.service.parking_lot.controller.response.ResponseSlots;
 import com.parking.service.parking_lot.entities.Parking;
 import com.parking.service.parking_lot.entities.Place;
 import com.parking.service.parking_lot.repository.ParkingRepository;
@@ -29,16 +30,50 @@ public class ParkingServiceImpl implements ParkingService {
     }
 
     @Override
-    public ResponseParkingDto getParkingByCampus(RequestCampusPark campus) {
+    public ResponseParkingDto getParkingByRequestCampus(RequestCampusPark campus) {
         List<Place> places = placeService.getAllPlaceByParkingId(campus.getParkingId());
         Optional<Parking> parking = parkingRepository.getParkingByCampus(campus.getCampus());
         return parking.map(value -> buildResponseParking(value, places)).orElse(null);
     }
 
     @Override
-    public List<ParkingCampusDto> getParkingByCampus() {
+    public List<ParkingCampusDto> getAllParkingByCampus() {
         return buildParkingCampus(parkingRepository.findAll());
 
+    }
+    @Override
+    public Optional<ResponseSlots> getPlaceAutoAssigned(String campus) {
+        Optional<Parking> parking = parkingRepository.getParkingByCampus(campus);
+        if(parking.isPresent()){
+            List<Place> places = placeService.getAllPlaceByParkingId(parking.get().getId());
+            return buildResponseSlots(places);
+        }else {
+            return null;
+        }
+    }
+
+    private Optional<ResponseSlots> buildResponseSlots(List<Place> places) {
+        long totalSlots = places.size();
+        long availableSlots = places.stream().filter(place -> place.getAvailable()==1).count();
+        Optional<Place> place = places.stream().filter(place1 -> place1.getAvailable()==1).findAny();
+        if(place.isPresent()){
+            //Reserv el lugar poniendo el available en cero
+            //placeService.updatePlace(place.get().getId());
+            //Build the response
+            return Optional.of(ResponseSlots.builder()
+                    .totalSlots(totalSlots)
+                    .availableSlots(availableSlots)
+                    .idSlot(place.get().getId())
+                    .basement(place.get().getBasement())
+                    .series(place.get().getSeries())
+                    .build());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Parking> getParkingByCampus(String campus) {
+        return parkingRepository.getParkingByCampus(campus);
     }
 
     private List<ParkingCampusDto> buildParkingCampus(List<Parking> parkings) {
@@ -78,4 +113,5 @@ public class ParkingServiceImpl implements ParkingService {
                 .build();
         return parkingRepository.save(parking);
     }
+
 }
